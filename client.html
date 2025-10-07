@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Client-Server con Fetch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .response-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .response-section.active {
+            display: block;
+        }
+        
+        .response-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .response-content {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .success {
+            color: #28a745;
+        }
+        
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Client-Server con Fetch</h1>
+        
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" placeholder="Inserisci il tuo nome">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Inserisci la tua email">
+        </div>
+        
+        <button onclick="inviaForm()">Invia Dati</button>
+        <div class="loading" id="loading" style="display: none;">⏳ Caricamento...</div>
+        
+        <div class="response-section" id="response">
+            <div class="response-title">Risposta dal server:</div>
+            <div class="response-content" id="responseContent"></div>
+        </div>
+    </div>
+
+    <script>
+        function inviaForm() {
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!nome || !email) {
+                alert('Compila tutti i campi!');
+                return;
+            }
+            
+            // Mostra loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('response').classList.remove('active');
+            
+            // Prepara i dati
+            const dati = {
+                nome: nome,
+                email: email
+            };
+            
+            // Effettua la richiesta al server
+            fetch('server.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dati)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').style.display = 'none';
+                mostraRisposta(data);
+            })
+            .catch(error => {
+                document.getElementById('loading').style.display = 'none';
+                mostraErrore(error);
+            });
+        }
+        
+        function mostraRisposta(data) {
+            const responseDiv = document.getElementById('response');
+            const contentDiv = document.getElementById('responseContent');
+            
+            if (data.successo) {
+                contentDiv.innerHTML = `
+                    <p class="success">✓ ${data.messaggio}</p>
+                    <p>Nome: <strong>${data.nome}</strong></p>
+                    <p>Email: <strong>${data.email}</strong></p>
+                    <p>Timestamp: <strong>${data.timestamp}</strong></p>
+                `;
+            } else {
+                contentDiv.innerHTML = `<p class="error">✗ ${data.messaggio}</p>`;
+            }
+            
+            responseDiv.classList.add('active');
+        }
+        
+        function mostraErrore(error) {
+            const responseDiv = document.getElementById('response');
+            const contentDiv = document.getElementById('responseContent');
+            
+            contentDiv.innerHTML = `<p class="error">✗ Errore di connessione: ${error.message}</p>`;
+            responseDiv.classList.add('active');
+        }
+    </script>
+</body>
+</html>
