@@ -166,6 +166,8 @@
             };
             
             // Effettua la richiesta al server
+            //Content-Type: application/json dice al server che i dati inviati sono in formato JSON
+            //Stringify converte un oggetto Javascript in Stringa Json
             fetch('server.php', {
                 method: 'POST',
                 headers: {
