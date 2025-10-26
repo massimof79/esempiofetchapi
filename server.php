@@ -11,6 +11,9 @@ header('Access-Control-Allow-Headers: Content-Type');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Leggi i dati JSON dal corpo della richiesta
+//    file_get_contents() legge il contenuto di un file o stream
+//php://input è uno stream speciale che rappresenta il corpo raw (grezzo) della richiesta HTTP
+//Questa riga cattura i dati inviati al server (ad esempio da una chiamata AJAX, API REST, ecc.) e li salva come stringa nella variabile $json
     $json = file_get_contents('php://input');
     $dati = json_decode($json, true);
     
